@@ -972,8 +972,7 @@ When is it generated: When user gets the response at app
         "messageId",
         "text",
         "timeTaken",
-        "queryId",
-        "response"
+        "queryId"
     ],
     "description": "When user gets the response at app"
 }

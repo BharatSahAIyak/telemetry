@@ -112,7 +112,7 @@ export class MetricsService {
       };
     });
     await this.clickhouse.insert({
-      table: 'poc_events',
+      table: `${process.env.CLICKHOUSE_TABLENAME}`,
       values: formattedEventData,
       format: 'JSONEachRow'
     });

@@ -14,7 +14,7 @@ sno,eventName,subEventName,When is it generated,Status,eventId,Event Desc (JSON)
 13,,translateOutput,translate - transformer,Done,E013,,Transformer,Required,Required,Required,Optional,Required,,,Required,,,,Optional,,Optional,,Required,,,Required,,,,,,,Optional,Required,,,,
 14,,textToSpeech,textToSpeech - transformer,Done,E014,,Transformer,Required,Required,Required,Optional,Required,Required,Optional,Required,,,,Required,,Optional,,Required,,,Required,,,,,,,Optional,Required,,,,
 15,,audioPlayed,When user plays audio at app,Done,E015,,App,Required,Required,Required,Optional,Required,,,Required,,,,Optional,,Optional,,Required,,,,,,,,,,Optional,,,,Requied,
-16,,responseReceivedAtApp,When user gets the response at app,Done,E016,,App,Required,Required,Required,Optional,Required,,,Required,,,,Required,,Optional,,Required,,,,,,,,,,Optional,Required,,,,
+16,,responseReceivedAtApp,When user gets the response at app,Done,E016,,App,Required,Required,Required,Optional,Required,,,Required,,,,Required,,Optional,,Required,,,,,,,,,,Optional,Optional,,,,
 17,userQueryInbound,outgoingMessage,A message was sent to user,New Data,E017,,Inbound,Required,Required,Required,Required,Required,,,Optional,Optional,,,Required,,,Required,,Required,,,,,,,,,,,,,,
 18,,convertXmsgFailed,XMessage to raw message conversion failed,New Data,E018,,Inbound,Required,Required,Required,Required,Required,,,Optional,Optional,,,,,,Required,,Required,,,,,,,,,,,,,,
 19,,convertMsgFailed,Raw message conversion to XMessage failed,New Data,E019,,Inbound,Required,,Required,Optional,Optional,,,Optional,Optional,,,,,,Required,,Required,,,,,,,,,,,,,,

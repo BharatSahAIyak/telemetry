@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS poc_events
+CREATE TABLE IF NOT EXISTS events
 (
 	generator String,
 	version String,

@@ -13,7 +13,6 @@ const schemaDraft = "http://json-schema.org/draft-07/schema#";
 let header = null;
 const schemaList = [];
 let lastEventName = '';
-const indexList = [];
 const HEADER_START_INDEX = 8;
 
 fs.createReadStream('events.csv')
@@ -117,7 +116,7 @@ function outputSchemaJson(schemaList) {
 
 function generateMigrationSql(headers, version) {
     let sql = '';
-    sql = sql + `CREATE TABLE IF NOT EXISTS poc_events\n`;
+    sql = sql + `CREATE TABLE IF NOT EXISTS ${process.env.CLICKHOUSE_TABLENAME}\n`;
     sql = sql + `(\n`
     sql = sql + `\tgenerator String,\n`
     sql = sql + `\tversion String,\n`
