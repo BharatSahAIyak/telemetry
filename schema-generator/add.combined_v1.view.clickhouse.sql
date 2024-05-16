@@ -6,7 +6,7 @@ SET allow_experimental_refreshable_materialized_view = 1;
 CREATE MATERIALIZED VIEW IF NOT EXISTS combined_data_v1 
 REFRESH EVERY 5 SECONDS 
 ENGINE = MergeTree
-ORDER BY timestamp 
+ORDER BY e_timestamp 
 SETTINGS allow_nullable_key = 1 AS
 
 SELECT
