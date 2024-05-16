@@ -9,7 +9,9 @@ ENGINE = MergeTree
 ORDER BY e_timestamp 
 SETTINGS allow_nullable_key = 1 AS
 
-SELECT
+select part_1.*, part_2.reactionText, part_2.reactionType
+FROM
+(SELECT
     messageId,
     maxIf(timeTaken, event = 'E002') AS spellCheckLatency,
     maxIf(timestamp, eventId = 'E032') AS e_timestamp,
@@ -35,8 +37,6 @@ SELECT
     maxIf(phoneNumber, eventId = 'E032') AS phoneNumber,
     maxIf(district, eventId = 'E006') AS district,
     maxIf(block, eventId = 'E006') AS block,
-    maxIf(reactionType, eventId = 'E023') AS reactionType,
-    maxIf(reactionText, eventId = 'E023') AS reactionText,
     maxIf(streamStartLatency, eventId = 'E012') as streamStartLatency,
     maxIf(timeTaken, eventId = 'E005' AND timeTaken > 0) AS getUserHistoryLatency,
     maxIf(timeTaken, eventId = 'E008' AND timeTaken > 0) AS getNeuralCoreferenceLatency,
@@ -66,7 +66,18 @@ FROM
     event
 where messageId is not null
 GROUP BY
-    messageId;
+    messageId) as part_1
+Left JOIN -- get the feedback information
+(
+    SELECT
+        toUUID(max(e1.replyId)) as messageId, max(e2.reactionText) as reactionText, max(e2.reactionType) as reactionType
+    FROM event as e1
+    JOIN event as e2
+    on e1.messageId = e2.messageId
+    WHERE e1.eventId = 'E033' and e2.eventId = 'E023' AND e1.replyId IS NOT NULL
+    group by e1.messageId
+) as part_2
+on part_1.messageId = part_2.messageId;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS mic_tap_view_v1
 REFRESH EVERY 5 SECONDS 
