@@ -80,7 +80,7 @@ SELECT
     maxIf(orgId, eventId = 'E032') AS orgId,
     maxIf(botId, eventId = 'E032') AS botId
 FROM
-    event
+    (select sessionId, Date(timestamp) as timestamp, eventId, orgId, botId from event) as intermediate
 WHERE sessionId IS NOT NULL
 GROUP BY
     sessionId, timestamp;
