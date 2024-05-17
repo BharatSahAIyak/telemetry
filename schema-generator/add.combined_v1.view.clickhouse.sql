@@ -3,13 +3,20 @@ DROP TABLE IF EXISTS mic_tap_view_v1;
 
 SET allow_experimental_refreshable_materialized_view = 1;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS combined_data_v1 
+DROP TABLE IF EXISTS combined_data_v1;
+
+SET allow_experimental_refreshable_materialized_view = 1;
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS combined_data 
 REFRESH EVERY 5 SECONDS 
 ENGINE = MergeTree
 ORDER BY e_timestamp 
 SETTINGS allow_nullable_key = 1 AS
 
-select part_1.*, part_2.reactionText, part_2.reactionType
+select 
+	part_1.* EXCEPT(reactionText, reactionType),
+	case when part_2.reactionText is null THEN part_1.reactionText ELSE part_2.reactionText END as reactionText,
+	case when part_2.reactionType is null THEN part_1.reactionType ELSE part_2.reactionType END as reactionType
 FROM
 (SELECT
     messageId,
@@ -37,6 +44,8 @@ FROM
     maxIf(phoneNumber, eventId = 'E032') AS phoneNumber,
     maxIf(district, eventId = 'E006') AS district,
     maxIf(block, eventId = 'E006') AS block,
+    maxIf(reactionType, eventId = 'E023') AS reactionType,
+	maxIf(reactionText, eventId = 'E023') AS reactionText,
     maxIf(streamStartLatency, eventId = 'E012') as streamStartLatency,
     maxIf(timeTaken, eventId = 'E005' AND timeTaken > 0) AS getUserHistoryLatency,
     maxIf(timeTaken, eventId = 'E008' AND timeTaken > 0) AS getNeuralCoreferenceLatency,
@@ -79,7 +88,7 @@ Left JOIN -- get the feedback information
 ) as part_2
 on part_1.messageId = part_2.messageId;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS mic_tap_view_v1
+CREATE MATERIALIZED VIEW IF NOT EXISTS mic_tap_view
 REFRESH EVERY 5 SECONDS 
 ENGINE = MergeTree
 ORDER BY sessionId 
