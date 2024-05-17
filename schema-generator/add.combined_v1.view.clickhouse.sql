@@ -1,9 +1,5 @@
-DROP TABLE IF EXISTS combined_data_v1;
+DROP TABLE IF EXISTS combined_data;
 DROP TABLE IF EXISTS mic_tap_view_v1;
-
-SET allow_experimental_refreshable_materialized_view = 1;
-
-DROP TABLE IF EXISTS combined_data_v1;
 
 SET allow_experimental_refreshable_materialized_view = 1;
 
