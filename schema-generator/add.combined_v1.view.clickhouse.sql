@@ -1,9 +1,9 @@
-DROP TABLE IF EXISTS combined_data;
+DROP TABLE IF EXISTS combined_view_v1;
 DROP TABLE IF EXISTS mic_tap_view_v1;
 
 SET allow_experimental_refreshable_materialized_view = 1;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS combined_data 
+CREATE MATERIALIZED VIEW IF NOT EXISTS combined_view_v1 
 REFRESH EVERY 5 SECONDS 
 ENGINE = MergeTree
 ORDER BY e_timestamp 
@@ -36,12 +36,12 @@ FROM
     maxIf(NER, eventId = 'E011' AND timeTaken > 0) AS NER,
     maxIf(text, eventId = 'E012' AND timeTaken > 0) AS response,
     groupArray(tuple(eventId, subEvent, error)) AS error,
-    maxIf(timesAudioUsed, eventId = 'E015') AS timesAudioUsed,
+    COUNTIf(eventId = 'E015') AS timesAudioUsed,
     maxIf(phoneNumber, eventId = 'E032') AS phoneNumber,
     maxIf(district, eventId = 'E006') AS district,
     maxIf(block, eventId = 'E006') AS block,
     maxIf(reactionType, eventId = 'E023') AS reactionType,
-	maxIf(reactionText, eventId = 'E023') AS reactionText,
+    maxIf(reactionText, eventId = 'E023') AS reactionText,
     maxIf(streamStartLatency, eventId = 'E012') as streamStartLatency,
     maxIf(timeTaken, eventId = 'E005' AND timeTaken > 0) AS getUserHistoryLatency,
     maxIf(timeTaken, eventId = 'E008' AND timeTaken > 0) AS getNeuralCoreferenceLatency,
