@@ -1,2 +1,2 @@
 ALTER TABLE event
-ADD COLUMN responseType Nullable(String) AFTER replyId;
+ADD COLUMN replyId Nullable(String) AFTER userHistory;
