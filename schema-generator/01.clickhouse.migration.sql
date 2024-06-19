@@ -70,7 +70,9 @@ CREATE TABLE IF NOT EXISTS event
 	reactionText Nullable(String),
 	userHistory Nullable(String),
 	replyId Nullable(String),
-	responseType Nullable(String)
+	responseType Nullable(String),
+	isGuided Nullable(String),
+	isFlowEnd Nullable(String)
 )
 ENGINE = MergeTree
 ORDER BY timestamp;
