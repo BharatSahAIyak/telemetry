@@ -826,6 +826,12 @@
                 },
                 "responseType": {
                     "type": "string"
+                },
+                "isGuided": {
+                    "type": "string"
+                },
+                "isFlowEnd": {
+                    "type": "string"
                 }
             },
             "required": [

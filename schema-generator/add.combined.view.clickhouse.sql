@@ -1,54 +1,63 @@
+DROP TABLE IF EXISTS combined_data_v1;
+DROP TABLE IF EXISTS mic_tap_view_v1;
 DROP TABLE IF EXISTS combined_data;
 DROP TABLE IF EXISTS mic_tap_view;
 DROP TABLE IF EXISTS feedback_view;
 
 SET allow_experimental_refreshable_materialized_view = 1;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS combined_data 
-REFRESH EVERY 5 SECONDS 
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS combined_data_v1 
+REFRESH EVERY 30 SECONDS 
 ENGINE = MergeTree
-ORDER BY timestamp 
+ORDER BY e_timestamp 
 SETTINGS allow_nullable_key = 1 AS
-SELECT
-    e1.messageId AS messageId,
-    e1.spellCheckLatency AS spellCheckLatency,
-    e1.timestamp AS timestamp,
-    e2.userId AS userId,
-    e2.orgId AS orgId,
-    e2.botId AS botId,
-    e2.sessionId AS sessionId,
-    e2.s2tInput AS s2tInput,
-    e2.conversationId AS conversationId,
-    e2.query AS query,
-    e12.translatedQuery AS translatedQuery,
-    e1.s2tOutput AS s2tOutput,
-    (CASE WHEN e2.query IS NOT NULL AND e1.s2tOutput IS NOT NULL AND e2.query != e1.s2tOutput THEN true ELSE false END) AS isQueryEdited,
-    e2.spellCorrectedText AS spellCorrectedText,
-    e2.responseAt AS responseAt,
-    e2.translatedResponse AS translatedResponse,
-    e2.coreferencedText AS coreferencedText,
-    e2.queryClass AS queryClass,
-    e2.NER AS NER,
-    e2.response AS response,
-    e2.error AS error,
-    e2.timesAudioUsed AS timesAudioUsed,
-    e2.phoneNumber AS phoneNumber,
-    e2.district AS district,
-    e2.block AS block,
-    e2.reactionType AS reactionType,
-    e2.reactionText AS reactionText,
-    e2.streamStartLatency as streamStartLatency,
-    e3.getUserHistoryLatency AS getUserHistoryLatency,
-    e4.getNeuralCoreferenceLatency AS getNeuralCoreferenceLatency,
-    e5.classifyQuestionLatency AS classifyQuestionLatency,
-    e6.getSimilarDocsLatency AS getSimilarDocsLatency,
-    e7.getResponseLatency AS getResponseLatency,
-    e8.NERLatency AS NERLatency,
-    e9.T2SLatency AS T2SLatency,
-    e10.S2TLatency AS S2TLatency,
-    e11.detectedLanguage AS detectedLanguage,
-    e11.detectedLatency AS detectedLatency,
-    e12.translateInputLatency AS translateInputLatency,
+
+select 
+	part_1.* EXCEPT(reactionText, reactionType),
+	case when part_2.reactionText is null THEN part_1.reactionText ELSE part_2.reactionText END as reactionText,
+	case when part_2.reactionType is null THEN part_1.reactionType ELSE part_2.reactionType END as reactionType
+FROM
+(SELECT
+    messageId,
+    maxIf(timeTaken, event = 'E002') AS spellCheckLatency,
+    maxIf(timestamp, eventId = 'E005') AS e_timestamp,
+    maxIf(userId, eventId = 'E032') AS userId,
+    maxIf(orgId, eventId = 'E032') AS orgId,
+    maxIf(botId, eventId = 'E032') AS botId,
+    maxIf(sessionId, eventId = 'E032') as sessionId,
+    maxIf(audioFileName, eventId = 'E002') as s2tInput,
+    maxIf(conversationId, eventId = 'E032') AS conversationId,
+    maxIf(text, eventId = 'E032') AS query,
+    maxIf(text, eventId = 'E007' AND timeTaken > 0) AS translatedQuery,
+    maxIf(text, eventId = 'E002') AS s2tOutput,
+    (CASE WHEN query IS NOT NULL AND s2tOutput IS NOT NULL AND query != s2tOutput THEN true ELSE false END) AS isQueryEdited,
+    maxIf(spellCorrectedText, eventId = 'E002') AS spellCorrectedText,
+    maxIf(timestamp, eventId = 'E005') AS responseAt,
+    maxIf(translatedResponse, eventId = 'E012' AND timeTaken > 0) AS translatedResponse,
+    maxIf(text, eventId = 'E008' AND timeTaken > 0 ) AS coreferencedText,
+    maxIf(queryClass, eventId = 'E009' AND timeTaken > 0) AS queryClass,
+    maxIf(NER, eventId = 'E011' AND timeTaken > 0) AS NER,
+    maxIf(text, eventId = 'E012' AND timeTaken > 0) AS response,
+    groupArray(tuple(eventId, subEvent, error)) AS error,
+    COUNTIf(eventId = 'E015') AS timesAudioUsed,
+    maxIf(phoneNumber, eventId = 'E032') AS phoneNumber,
+    maxIf(district, eventId = 'E006') AS district,
+    maxIf(block, eventId = 'E006') AS block,
+    maxIf(reactionType, eventId = 'E023') AS reactionType,
+    maxIf(reactionText, eventId = 'E023') AS reactionText,
+    maxIf(streamStartLatency, eventId = 'E012') as streamStartLatency,
+    maxIf(timeTaken, eventId = 'E005' AND timeTaken > 0) AS getUserHistoryLatency,
+    maxIf(timeTaken, eventId = 'E008' AND timeTaken > 0) AS getNeuralCoreferenceLatency,
+    maxIf(timeTaken, eventId = 'E009' AND timeTaken > 0) AS classifyQuestionLatency,
+    maxIf(timeTaken, eventId = 'E010' AND timeTaken > 0) AS getSimilarDocsLatency,
+    maxIf(timeTaken, eventId = 'E012' AND timeTaken > 0) AS getResponseLatency,
+    maxIf(timeTaken, eventId = 'E011' AND timeTaken > 0) AS NERLatency,
+    maxIf(timeTaken, eventId = 'E014' AND timeTaken > 0) AS T2SLatency,
+    maxIf(timeTaken, eventId = 'E002') AS S2TLatency,
+    maxIf(language, eventId = 'E047') AS detectedLanguage,
+    maxIf(timeTaken, eventId = 'E047') AS detectedLatency,
+    maxIf(timeTaken, eventId = 'E007' AND timeTaken > 0) AS translateInputLatency,
     COALESCE(spellCheckLatency, 0) +
     COALESCE(getUserHistoryLatency, 0) +
     COALESCE(getNeuralCoreferenceLatency, 0) +
@@ -60,257 +69,41 @@ SELECT
     COALESCE(S2TLatency, 0) +
     COALESCE(detectedLatency, 0) +
     COALESCE(translateInputLatency, 0) AS totalLatency,
-    e10.similarChunks AS similarChunks,
-    e2.prompt AS prompt
+    maxIf(similarChunks, eventId = 'E010') AS similarChunks,
+    maxIf(prompt, eventId = 'E012' AND timeTaken > 0) AS prompt,
+    maxIf(responseType, eventId = 'E012' AND timeTaken > 0) AS responseType,
+    maxIf(isGuided, eventId = 'E012' AND timeTaken > 0) AS isGuided,
+    maxIf(isFlowEnd, eventId = 'E012' AND timeTaken > 0) AS isFlowEnd
 FROM
-    (
-        SELECT
-            messageId,
-            maxIf(timeTaken, event = 'E002') AS spellCheckLatency,
-            maxIf(timestamp, eventId = 'E032') AS timestamp,
-            maxIf(text, eventId = 'E002') AS s2tOutput
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e1
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(userId, eventId = 'E032') AS userId,
-            maxIf(orgId, eventId = 'E032') AS orgId,
-            maxIf(botId, eventId = 'E032') AS botId,
-            maxIf(audioFileName, eventId = 'E002') as s2tInput,
-            maxIf(conversationId, eventId = 'E032') AS conversationId,
-            maxIf(spellCorrectedText, eventId = 'E002') AS spellCorrectedText,
-            maxIf(text, eventId = 'E032') AS query,
-            maxIf(timestamp, eventId = 'E017') AS responseAt,
-            maxIf(streamStartLatency, eventId = 'E012') as streamStartLatency,
-            maxIf(sessionId, eventId = 'E032') as sessionId,
-            maxIf(
-                prompt, 
-                eventId = 'E012'
-                AND timeTaken > 0
-            ) AS prompt,
-            maxIf(
-                translatedResponse, 
-                eventId = 'E012'
-                AND timeTaken > 0
-            ) AS translatedResponse,
-            maxIf(
-                text,
-                eventId = 'E008'
-                AND timeTaken > 0
-            ) AS coreferencedText,
-            maxIf(
-                queryClass,
-                eventId = 'E009'
-                AND timeTaken > 0
-            ) AS queryClass,
-            maxIf(
-                NER,
-                eventId = 'E011'
-                AND timeTaken > 0
-            ) AS NER,
-            maxIf(
-                text,
-                eventId = 'E012'
-                AND timeTaken > 0
-            ) AS response,
-            groupArray(tuple(eventId, subEvent, error)) AS error,
-            maxIf(reactionType, eventId = 'E023') AS reactionType,
-            maxIf(reactionText, eventId = 'E023') AS reactionText,
-            maxIf(timesAudioUsed, eventId = 'E015') AS timesAudioUsed,
-            maxIf(phoneNumber, eventId = 'E032') AS phoneNumber,
-            maxIf(district, eventId = 'E006') AS district,
-            maxIf(block, eventId = 'E006') AS block
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e2 ON e1.messageId = e2.messageId
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(
-                timeTaken,
-                eventId = 'E005'
-                AND timeTaken > 0
-            ) AS getUserHistoryLatency
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e3 ON e1.messageId = e3.messageId
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(
-                timeTaken,
-                eventId = 'E008'
-                AND timeTaken > 0
-            ) AS getNeuralCoreferenceLatency
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e4 ON e1.messageId = e4.messageId
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(
-                timeTaken,
-                eventId = 'E009'
-                AND timeTaken > 0
-            ) AS classifyQuestionLatency
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e5 ON e1.messageId = e5.messageId
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(
-                timeTaken,
-                eventId = 'E010'
-                AND timeTaken > 0
-            ) AS getSimilarDocsLatency
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e6 ON e1.messageId = e6.messageId
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(
-                timeTaken,
-                eventId = 'E012'
-                AND timeTaken > 0
-            ) AS getResponseLatency
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e7 ON e1.messageId = e7.messageId
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(
-                timeTaken,
-                eventId = 'E011'
-                AND timeTaken > 0
-            ) AS NERLatency
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e8 ON e1.messageId = e8.messageId
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(
-                timeTaken,
-                eventId = 'E014'
-                AND timeTaken > 0
-            ) AS T2SLatency
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e9 ON e1.messageId = e9.messageId
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(
-                timeTaken,
-                eventId = 'E002'
-            ) AS S2TLatency,
-            maxIf(similarChunks, eventId = 'E010') AS similarChunks
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e10 ON e1.messageId = e10.messageId
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(
-                timeTaken,
-                eventId = 'E047'
-            ) AS detectedLatency,
-            maxIf(language, eventId = 'E047') AS detectedLanguage
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e11 ON e1.messageId = e11.messageId
-    JOIN (
-        SELECT
-            messageId,
-            maxIf(
-                text,
-                eventId = 'E007'
-                AND timeTaken > 0
-            ) AS translatedQuery,
-            maxIf(
-                timeTaken,
-                eventId = 'E007'
-                AND timeTaken > 0
-            ) AS translateInputLatency,
-            maxIf(similarChunks, eventId = 'E010') AS similarChunks
-        FROM
-            event
-        GROUP BY
-            messageId
-    ) AS e12 ON e1.messageId = e12.messageId;
+    event
+where messageId is not null
+GROUP BY
+    messageId) as part_1
+Left JOIN -- get the feedback information
+(
+    SELECT
+        toUUID(max(e1.replyId)) as messageId, max(e2.reactionText) as reactionText, max(e2.reactionType) as reactionType
+    FROM event as e1
+    JOIN event as e2
+    on e1.messageId = e2.messageId
+    WHERE e1.eventId = 'E033' and e2.eventId = 'E023' AND e1.replyId IS NOT NULL
+    group by e1.messageId
+) as part_2
+on part_1.messageId = part_2.messageId;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS mic_tap_view
-REFRESH EVERY 5 SECONDS 
+REFRESH EVERY 30 SECONDS 
 ENGINE = MergeTree
 ORDER BY sessionId 
 SETTINGS allow_nullable_key = 1 AS
 SELECT
     sessionId,
     timestamp,
-    COUNTIf(eventId = 'E044') AS count
+    COUNTIf(eventId = 'E044') AS count,
+    maxIf(orgId, eventId = 'E032') AS orgId,
+    maxIf(botId, eventId = 'E032') AS botId
 FROM
-    event
+    (select sessionId, Date(timestamp) as timestamp, eventId, orgId, botId from event) as intermediate
 WHERE sessionId IS NOT NULL
 GROUP BY
     sessionId, timestamp;
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS feedback_view
-REFRESH EVERY 5 SECONDS 
-ENGINE = MergeTree
-ORDER BY timestamp 
-SETTINGS allow_nullable_key = 1 AS
-SELECT
-    toUUID(ee1.replyId) AS messageId,
-    ee2.reactionText AS reactionText,
-    ee2.reactionType AS reactionType,
-    ee2.timestamp AS timestamp
-FROM
-(
-    SELECT
-        DISTINCT messageId,
-        replyId
-    FROM
-        event
-    WHERE
-        eventId = 'E033'
-    AND 
-        replyId IS NOT NULL
-) AS ee1
-JOIN (
-    SELECT
-        messageId,
-        reactionText,
-        reactionType,
-        timestamp
-    FROM
-        event
-    WHERE
-        eventId = 'E023'
-) AS ee2 ON ee1.messageId = ee2.messageId;

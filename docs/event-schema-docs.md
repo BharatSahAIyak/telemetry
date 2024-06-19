@@ -793,6 +793,12 @@ When is it generated: llm - transformer
         },
         "responseType": {
             "type": "string"
+        },
+        "isGuided": {
+            "type": "string"
+        },
+        "isFlowEnd": {
+            "type": "string"
         }
     },
     "required": [

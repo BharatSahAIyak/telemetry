@@ -20,3 +20,11 @@ model EventSchemaV1 {
   subEvent String
   schema   Json
 }
+
+model MaterializedViewMapping {
+  id         Int      @id @default(autoincrement())
+  bot_id     String
+  org_id     String
+  tableName  String
+  created_at DateTime @default(now())
+}
