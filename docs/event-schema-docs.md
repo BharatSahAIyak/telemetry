@@ -36,6 +36,9 @@ When is it generated: BFF received audio from a bot
             "type": "string",
             "format": "uuid"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "language": {
             "type": "string"
         }
@@ -120,8 +123,7 @@ When is it generated: Audio is converted to text from audio
         "userId",
         "orgId",
         "messageId",
-        "timeTaken",
-        "createdAt"
+        "timeTaken"
     ],
     "description": "Audio is converted to text from audio"
 }
@@ -197,7 +199,6 @@ When is it generated: AudioId is mapped to QueryId
         "spellCorrectedText",
         "timeTaken",
         "spellCheckTimeTaken",
-        "createdAt",
         "queryId"
     ],
     "description": "AudioId is mapped to QueryId"
@@ -252,8 +253,7 @@ When is it generated: User sent a message to a bot
         "userId",
         "orgId",
         "messageId",
-        "text",
-        "createdAt"
+        "text"
     ],
     "description": "User sent a message to a bot"
 }
@@ -282,6 +282,9 @@ When is it generated: Fetching user history at inbound
             "format": "uuid"
         },
         "timeTaken": {
+            "type": "number"
+        },
+        "createdAt": {
             "type": "number"
         },
         "did": {
@@ -335,6 +338,9 @@ When is it generated: Fetching user info - transformer
             "type": "string"
         },
         "timeTaken": {
+            "type": "number"
+        },
+        "createdAt": {
             "type": "number"
         },
         "queryId": {
@@ -404,6 +410,9 @@ When is it generated: translate - transformer
         "phoneNumber": {
             "type": "string"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "queryId": {
             "type": "string",
             "format": "uuid"
@@ -470,6 +479,9 @@ When is it generated: nuralCoref - transformer
         },
         "phoneNumber": {
             "type": "string"
+        },
+        "createdAt": {
+            "type": "number"
         },
         "queryId": {
             "type": "string",
@@ -538,6 +550,9 @@ When is it generated: classifier - transformer
         "phoneNumber": {
             "type": "string"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "queryId": {
             "type": "string",
             "format": "uuid"
@@ -604,6 +619,9 @@ When is it generated: retieveDocs - transformer
         },
         "phoneNumber": {
             "type": "string"
+        },
+        "createdAt": {
+            "type": "number"
         },
         "queryId": {
             "type": "string",
@@ -672,6 +690,9 @@ When is it generated: ner - transformer
         "phoneNumber": {
             "type": "string"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "queryId": {
             "type": "string",
             "format": "uuid"
@@ -739,6 +760,9 @@ When is it generated: llm - transformer
         "phoneNumber": {
             "type": "string"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "queryId": {
             "type": "string",
             "format": "uuid"
@@ -766,6 +790,15 @@ When is it generated: llm - transformer
         },
         "streamStartLatency": {
             "type": "number"
+        },
+        "responseType": {
+            "type": "string"
+        },
+        "isGuided": {
+            "type": "string"
+        },
+        "isFlowEnd": {
+            "type": "string"
         }
     },
     "required": [
@@ -816,6 +849,9 @@ When is it generated: translate - transformer
         },
         "phoneNumber": {
             "type": "string"
+        },
+        "createdAt": {
+            "type": "number"
         },
         "queryId": {
             "type": "string",
@@ -899,6 +935,9 @@ When is it generated: textToSpeech - transformer
         "phoneNumber": {
             "type": "string"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "queryId": {
             "type": "string",
             "format": "uuid"
@@ -965,6 +1004,9 @@ When is it generated: When user plays audio at app (timesAudioUsed)
         "phoneNumber": {
             "type": "string"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "responseInEnglish": {
             "type": "string"
         },
@@ -1012,6 +1054,9 @@ When is it generated: When an error is occured during query process
         "error": {
             "type": "string"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "errorRate": {
             "type": "number"
         }
@@ -1058,6 +1103,9 @@ When is it generated: When user gets the response at app (responseAt)
         "phoneNumber": {
             "type": "string"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "responseInEnglish": {
             "type": "string"
         },
@@ -1099,6 +1147,9 @@ When is it generated:
             "format": "uuid"
         },
         "timeTaken": {
+            "type": "number"
+        },
+        "createdAt": {
             "type": "number"
         },
         "language": {
@@ -1164,7 +1215,6 @@ When is it generated: A message was sent to user
         "conversationId",
         "messageId",
         "timeTaken",
-        "createdAt",
         "did"
     ],
     "description": "A message was sent to user"
@@ -1216,7 +1266,6 @@ When is it generated: XMessage to raw message conversion failed
         "orgId",
         "conversationId",
         "messageId",
-        "createdAt",
         "did"
     ],
     "description": "XMessage to raw message conversion failed"
@@ -1261,7 +1310,6 @@ When is it generated: Raw message conversion to XMessage failed
     "required": [
         "botId",
         "orgId",
-        "createdAt",
         "did"
     ],
     "description": "Raw message conversion to XMessage failed"
@@ -1311,7 +1359,6 @@ When is it generated: A registration request was sent to the bot
         "orgId",
         "conversationId",
         "messageId",
-        "createdAt",
         "did",
         "userManagementUrl"
     ],
@@ -1362,7 +1409,6 @@ When is it generated: A registration request failed
         "orgId",
         "conversationId",
         "messageId",
-        "createdAt",
         "did",
         "userManagementUrl"
     ],
@@ -1391,6 +1437,9 @@ When is it generated: A user sent a feedback on a message
         "messageId": {
             "type": "string",
             "format": "uuid"
+        },
+        "createdAt": {
+            "type": "number"
         },
         "did": {
             "type": "string"
@@ -1453,7 +1502,6 @@ When is it generated: User read the message sent by a bot
         "orgId",
         "conversationId",
         "messageId",
-        "createdAt",
         "did"
     ],
     "description": "User read the message sent by a bot"
@@ -1705,6 +1753,9 @@ When is it generated: migration of data
         "orgId": {
             "type": "string",
             "format": "uuid"
+        },
+        "createdAt": {
+            "type": "number"
         }
     },
     "required": [
@@ -1728,6 +1779,9 @@ When is it generated: migration of data
         "orgId": {
             "type": "string",
             "format": "uuid"
+        },
+        "createdAt": {
+            "type": "number"
         }
     },
     "required": [
@@ -1752,6 +1806,9 @@ When is it generated: migration of data
         "orgId": {
             "type": "string",
             "format": "uuid"
+        },
+        "createdAt": {
+            "type": "number"
         }
     },
     "required": [
@@ -1788,6 +1845,9 @@ When is it generated: On return of this API call
             "type": "string"
         },
         "timeTaken": {
+            "type": "number"
+        },
+        "createdAt": {
             "type": "number"
         },
         "question": {
@@ -1840,6 +1900,9 @@ When is it generated: On return of this API call
             "type": "string"
         },
         "timeTaken": {
+            "type": "number"
+        },
+        "createdAt": {
             "type": "number"
         },
         "sqlQuery": {
@@ -1903,8 +1966,7 @@ When is it generated: When user sends a message (send phoneNumber also)
         "userId",
         "orgId",
         "messageId",
-        "text",
-        "createdAt"
+        "text"
     ],
     "description": "When user sends a message (send phoneNumber also)"
 }
@@ -2003,6 +2065,9 @@ When is it generated: On return of this API call
         "timeTaken": {
             "type": "number"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "datasetId": {
             "type": "string",
             "format": "uuid"
@@ -2066,6 +2131,9 @@ When is it generated: On return of this API call
         "timeTaken": {
             "type": "number"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "datasetId": {
             "type": "string",
             "format": "uuid"
@@ -2125,6 +2193,9 @@ When is it generated: On return of this API call
         "timeTaken": {
             "type": "number"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "datasetId": {
             "type": "string",
             "format": "uuid"
@@ -2181,6 +2252,9 @@ When is it generated: On return of this API call
         "timeTaken": {
             "type": "number"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "requestId": {
             "type": "string",
             "format": "uuid"
@@ -2221,6 +2295,9 @@ When is it generated: On return of this API call
             "type": "string"
         },
         "timeTaken": {
+            "type": "number"
+        },
+        "createdAt": {
             "type": "number"
         },
         "schemaId": {
@@ -2264,6 +2341,9 @@ When is it generated: When the transformer execution begins
         "error": {
             "type": "string"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "transformerId": {
             "type": "string"
         }
@@ -2302,6 +2382,9 @@ When is it generated: When the transformer execution completes
         "timeTaken": {
             "type": "number"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "transformerId": {
             "type": "string"
         }
@@ -2337,6 +2420,9 @@ When is it generated: When user taps on mic to speak something
         "conversationId": {
             "type": "string",
             "format": "uuid"
+        },
+        "createdAt": {
+            "type": "number"
         }
     },
     "required": [
@@ -2489,6 +2575,9 @@ When is it generated: Time taken in detecting latency
         "timeTaken": {
             "type": "number"
         },
+        "createdAt": {
+            "type": "number"
+        },
         "language": {
             "type": "string"
         }
@@ -2520,6 +2609,9 @@ When is it generated: Every time user interacts with the bot (phone number, ques
             "format": "uuid"
         },
         "timeTaken": {
+            "type": "number"
+        },
+        "createdAt": {
             "type": "number"
         },
         "did": {
@@ -2575,6 +2667,9 @@ When is it generated: Sent by outbound when response message is received
         },
         "text": {
             "type": "string"
+        },
+        "createdAt": {
+            "type": "number"
         },
         "did": {
             "type": "string"
